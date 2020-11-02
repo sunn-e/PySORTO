@@ -3,6 +3,8 @@ from tkinter import ttk
 import random
 import time
 
+from sorts.bubbleSort import bubbleSort
+
 root = Tk()
 
 root.title('PySORTO- Sorting Visualiser')
@@ -10,6 +12,9 @@ root.maxsize = (900, 600)
 # purplish color
 root.config(bg='#9000F0')
 
+# Global Variables
+data = []
+selected_alg = StringVar()
 
 # Base GUI/frame window
 # User Console/window
@@ -27,15 +32,10 @@ runtime_canvas = Canvas(root, width=200, height=100, bg='#FFFFFF')
 runtime_canvas.grid(row=2, column=0, padx=5, pady=5)
 
 
-# Variables
-
-selected_alg = StringVar()
-
-
 # test function
 
 
-def drawData(data, refreshVal):
+def drawData(data, colorArray):
     start_time = time.time()
     # delete old canvas
     canvas.delete("all")
@@ -60,7 +60,6 @@ def drawData(data, refreshVal):
         normalizedData.append(temp)
 
     # normalizedData = data
-    refresh_seconds = 1
     for i, height in enumerate(normalizedData):
         # top left
         x0 = i * x_width + offset + spacing
@@ -69,13 +68,14 @@ def drawData(data, refreshVal):
         x1 = (i+1) * x_width + offset
         y1 = c_height
 
-        canvas.create_rectangle(x0, y0, x1, y1, fill="#9000F0")
+        canvas.create_rectangle(x0, y0, x1, y1, fill=colorArray[i])
         canvas.create_text((x0+2), y0, anchor=SW, text=str(data[i]))
 
         # animation
-        root.update()
-        time.sleep(refreshVal)
+        # root.update()
+        # time.sleep(refreshVal)
         # time.sleep(1)
+    root.update_idletasks()
 
     # runtime canvas/window
     print("Execution time: " + str(time.time() - start_time))
@@ -86,7 +86,9 @@ def drawData(data, refreshVal):
 
 
 def Generate():
+    global data
     print("Running" + selected_alg.get())
+
     # to generate user data
     # generate and save random array in data[]
 
@@ -121,6 +123,7 @@ def Generate():
         if sizeVal < 1:
             sizeVal = random.randrange(1, 1337)
 
+    '''
     # refrsh rate
     try:
         refreshVal = float(refreshEntry.get())
@@ -129,50 +132,77 @@ def Generate():
     finally:
         if refreshVal < 0:
             refreshVal = 0.25
-
-    for temp in range(sizeVal):
+    '''
+    for _ in range(sizeVal):
         data.append(random.randrange(minVal, maxVal + 1))
 
-    drawData(data, refreshVal)
-
-# UI
+    drawData(data, ['#FF0000' for x in range(len(data))])
 
 
-# row 1
+def startAlgorithm():
+    print("wassup")
+    bubbleSort(data, drawData, speedScale.get())
+
+    # UI
+
+
+    # row 1
 Label(UI_frame, text="Algorithm: ", bg='#FFFF66').grid(
     row=0, column=0, padx=5, pady=5, sticky=W)
 algMenu = ttk.Combobox(UI_frame, textvariable=selected_alg,
                        values=['Bubble Sort', "Merge Sort"])
 algMenu.grid(row=0, column=1, padx=5, pady=5)
 algMenu.current(0)
-Button(UI_frame, text="Generate", command=Generate,
-       bg='#9000F0').grid(row=0, column=2, padx=5, pady=5)
+
+# scale
+speedScale = Scale(UI_frame, from_=0.0, to=2.0,
+                   length=200, digits=2, resolution=0.2, orient=HORIZONTAL, label="Speed in secs")
+speedScale.grid(row=0, column=2, padx=5, pady=5)
+
+Button(UI_frame, text="Start", command=startAlgorithm,
+       bg='#9000F0').grid(row=0, column=3, padx=5, pady=5)
 
 # row 2
+'''
 Label(UI_frame, text="Size: ", bg='#FFFF66').grid(
     row=1, column=0, padx=5, pady=5, sticky=W)
 
 sizeEntry = Entry(UI_frame)
-sizeEntry.grid(row=1, column=1, padx=5, pady=5, sticky=W
-               )
+'''
+sizeEntry = Scale(UI_frame, from_=3, to=25,
+                  resolution=0.2, orient=HORIZONTAL, label="Dataset size")
 
+sizeEntry.grid(row=1, column=0, padx=5, pady=5
+               )
+'''
 Label(UI_frame, text="Minimum Value ", bg='#FFFF66').grid(
     row=1, column=2, padx=5, pady=5, sticky=W)
 minEntry = Entry(UI_frame)
-minEntry.grid(row=1, column=3, padx=5, pady=5, sticky=W
+'''
+minEntry = Scale(UI_frame, from_=0, to=10,
+                 resolution=0.2, orient=HORIZONTAL, label="Minimum value")
+minEntry.grid(row=1, column=1, padx=5, pady=5
               )
-
+'''
 Label(UI_frame, text="Maximum Value ", bg='#FFFF66').grid(
     row=1, column=4, padx=5, pady=5, sticky=W)
 maxEntry = Entry(UI_frame)
-maxEntry.grid(row=1, column=5, padx=5, pady=5, sticky=W
+'''
+maxEntry = Scale(UI_frame, from_=10, to=100,
+                 resolution=0.2, orient=HORIZONTAL, label="Maximum value")
+maxEntry.grid(row=1, column=2, padx=5, pady=5
               )
-
+'''
 Label(UI_frame, text="Refresh rate in seconds ", bg='#FFFF66').grid(
     row=1, column=6, padx=5, pady=5, sticky=W)
 refreshEntry = Entry(UI_frame)
-refreshEntry.grid(row=1, column=7, padx=5, pady=5, sticky=W
-                  )
 
+refreshEntry = Scale(UI_frame, from_=0, to=1.0,
+                     resolution=0.2, orient=HORIZONTAL, label="refresh rate")
+refreshEntry.grid(row=1, column=3, padx=5, pady=5
+                  )
+'''
+Button(UI_frame, text="Generate", command=Generate,
+       bg='#9000F0').grid(row=1, column=4, padx=5, pady=5)
 # main loop
 root.mainloop()
