@@ -5,25 +5,26 @@ import time
 
 root = Tk()
 
-root.title('PySORTO- Sorting visualiser')
-root.maxsize = (1600, 1600)
-root.config(bg='orange')
+root.title('PySORTO- Sorting Visualiser')
+root.maxsize = (900, 600)
+# purplish color
+root.config(bg='#9000F0')
 
 
-# Base GUI window
+# Base GUI/frame window
 # User Console/window
-UI_frame = Frame(root, width=800, height=150, bg='purple')
-UI_frame.grid(row=0, column=0, padx=10, pady=10)
+UI_frame = Frame(root, width=600, height=200, bg='#FFB366')
+UI_frame.grid(row=0, column=0, padx=10, pady=5)
 
 # Visualization window
-canvas = Canvas(root, width=800, height=400, bg='white')
-canvas.grid(row=1, column=0, padx=10, pady=10)
+canvas = Canvas(root, width=600, height=380, bg='#FFFFFF')
+canvas.grid(row=1, column=0, padx=10, pady=5)
 
-# Runtim window
+# Runtime window
 
 # Visualization window
-runtime_canvas = Canvas(root, width=200, height=400, bg='white')
-runtime_canvas.grid(row=1, column=1, padx=10, pady=10)
+runtime_canvas = Canvas(root, width=200, height=100, bg='#FFFFFF')
+runtime_canvas.grid(row=2, column=0, padx=5, pady=5)
 
 
 # Variables
@@ -34,12 +35,11 @@ selected_alg = StringVar()
 # test function
 
 
-def drawData(data):
+def drawData(data, refreshVal):
     start_time = time.time()
-    # delete old canvas if it exists
-    if (canvas or runtime_canvas):
-        canvas.delete("all")
-        runtime_canvas.delete("all")
+    # delete old canvas
+    canvas.delete("all")
+    runtime_canvas.delete("all")
 
     c_height = 400
     c_width = 600
@@ -60,6 +60,7 @@ def drawData(data):
         normalizedData.append(temp)
 
     # normalizedData = data
+    refresh_seconds = 1
     for i, height in enumerate(normalizedData):
         # top left
         x0 = i * x_width + offset + spacing
@@ -68,13 +69,17 @@ def drawData(data):
         x1 = (i+1) * x_width + offset
         y1 = c_height
 
-        canvas.create_rectangle(x0, y0, x1, y1, fill="orange")
+        canvas.create_rectangle(x0, y0, x1, y1, fill="#9000F0")
         canvas.create_text((x0+2), y0, anchor=SW, text=str(data[i]))
+
+        # animation
+        root.update()
+        time.sleep(refreshVal)
         # time.sleep(1)
 
     # runtime canvas/window
     print("Execution time: " + str(time.time() - start_time))
-    # runtime_canvas.create_rectangle(20, 20, 20, 20, fill="orange")
+    # runtime_canvas.create_rectangle(20, 20, 20, 20, fill="#FFFF66")
     runtime_canvas.create_text(20, 20, anchor=SW,
                                text=("runtime( in seconds):" + str(time.time() -
                                                                    start_time)))
@@ -86,6 +91,8 @@ def Generate():
     # generate and save random array in data[]
 
     data = []
+
+    # Minimum value in dataset
     try:
         minVal = int(minEntry.get())
     except:
@@ -95,6 +102,7 @@ def Generate():
         if minVal < 0:
             minVal = 0
 
+    # Maximum value in dataset
     try:
         maxVal = int(maxEntry.get())
     except:
@@ -104,6 +112,7 @@ def Generate():
         if maxVal < 0:
             maxVal = random.randrange(1, 1337)
 
+    # size of dataset
     try:
         sizeVal = int(sizeEntry.get())
     except:
@@ -112,43 +121,58 @@ def Generate():
         if sizeVal < 1:
             sizeVal = random.randrange(1, 1337)
 
+    # refrsh rate
+    try:
+        refreshVal = float(refreshEntry.get())
+    except:
+        refreshVal = 0.25
+    finally:
+        if refreshVal < 0:
+            refreshVal = 0.25
+
     for temp in range(sizeVal):
         data.append(random.randrange(minVal, maxVal + 1))
 
-    drawData(data)
+    drawData(data, refreshVal)
 
 # UI
 
 
 # row 1
-Label(UI_frame, text="Algorithm: ", bg='orange').grid(
+Label(UI_frame, text="Algorithm: ", bg='#FFFF66').grid(
     row=0, column=0, padx=5, pady=5, sticky=W)
 algMenu = ttk.Combobox(UI_frame, textvariable=selected_alg,
                        values=['Bubble Sort', "Merge Sort"])
 algMenu.grid(row=0, column=1, padx=5, pady=5)
 algMenu.current(0)
 Button(UI_frame, text="Generate", command=Generate,
-       bg='orange').grid(row=0, column=2, padx=5, pady=5)
+       bg='#9000F0').grid(row=0, column=2, padx=5, pady=5)
 
 # row 2
-Label(UI_frame, text="Size: ", bg='orange').grid(
+Label(UI_frame, text="Size: ", bg='#FFFF66').grid(
     row=1, column=0, padx=5, pady=5, sticky=W)
 
 sizeEntry = Entry(UI_frame)
 sizeEntry.grid(row=1, column=1, padx=5, pady=5, sticky=W
                )
 
-Label(UI_frame, text="Minimum Value ", bg='orange').grid(
+Label(UI_frame, text="Minimum Value ", bg='#FFFF66').grid(
     row=1, column=2, padx=5, pady=5, sticky=W)
 minEntry = Entry(UI_frame)
 minEntry.grid(row=1, column=3, padx=5, pady=5, sticky=W
               )
 
-Label(UI_frame, text="Maximum Value ", bg='orange').grid(
+Label(UI_frame, text="Maximum Value ", bg='#FFFF66').grid(
     row=1, column=4, padx=5, pady=5, sticky=W)
 maxEntry = Entry(UI_frame)
 maxEntry.grid(row=1, column=5, padx=5, pady=5, sticky=W
               )
+
+Label(UI_frame, text="Refresh rate in seconds ", bg='#FFFF66').grid(
+    row=1, column=6, padx=5, pady=5, sticky=W)
+refreshEntry = Entry(UI_frame)
+refreshEntry.grid(row=1, column=7, padx=5, pady=5, sticky=W
+                  )
 
 # main loop
 root.mainloop()
