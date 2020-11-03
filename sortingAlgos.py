@@ -4,6 +4,7 @@ import random
 import time
 
 from sorts.bubbleSort import bubbleSort
+from sorts.mergeSort import mergeSort
 
 root = Tk()
 
@@ -140,13 +141,21 @@ def Generate():
 
 
 def startAlgorithm():
-    print("wassup")
-    bubbleSort(data, drawData, speedScale.get())
+    global data
+    if not data:
+        print("Error: No dataset")
+        return
 
-    # UI
+    if algMenu.get() == "Merge Sort":
+        mergeSort(data, drawData, speedScale.get())
+    elif algMenu.get() == "Bubble Sort":
+        bubbleSort(data, drawData, speedScale.get())
+
+    drawData(data, ['green' for x in range(len(data))])
 
 
-    # row 1
+# UI
+# row 1
 Label(UI_frame, text="Algorithm: ", bg='#FFFF66').grid(
     row=0, column=0, padx=5, pady=5, sticky=W)
 algMenu = ttk.Combobox(UI_frame, textvariable=selected_alg,
